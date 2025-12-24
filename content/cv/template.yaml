@@ -1,0 +1,79 @@
+name: Name Surname
+assets:
+  signature: template_signature.png
+  signature_width: 50mm
+  picture: template_photo.png
+
+colors:
+  primary: "000000"
+  secondary: "666666"
+
+profile: Experienced professional with expertise in software development and project management. Passionate about delivering innovative solutions and leading high-performing teams to achieve business objectives.
+
+contact:
+  location: San Francisco, CA
+  email: jane.smith@example.com
+  phone: +1 (555) 123-4567
+  website: janesmith.dev
+  linkedin: linkedin.com/in/janesmith
+  github: github.com/janesmith
+  
+personal_info:
+  birthdate: January 15, 1992
+  citizenship: United States
+  languages:
+    - name: English
+      level: Native
+    - name: Spanish
+      level: Fluent
+    - name: French
+      level: Intermediate
+
+key_skills:
+  - Python
+  - JavaScript
+  - React
+  - AWS
+  - Docker
+  - PostgreSQL
+  - Git
+  - Agile
+
+professional_experience:
+  - position: Senior Software Engineer
+    company: Tech Corporation
+    dates: 2021-Present
+    details:
+      - Led development of microservices architecture serving 2M+ users
+      - Mentored 5 junior developers and conducted technical interviews
+      - Reduced API latency by 40% through optimization and caching strategies
+      - Implemented CI/CD pipeline improving deployment frequency by 5x
+
+  - position: Software Engineer
+    company: StartupXYZ
+    dates: 2018-2021
+    details:
+      - Developed full-stack web application using React and Node.js
+      - Designed and implemented PostgreSQL database schema
+      - Integrated third-party APIs and payment processing systems
+      - Improved test coverage from 45% to 85%
+
+additional_experience:
+  - position: Open Source Contributor
+    company: Apache Project
+    dates: 2019-Present
+    details:
+      - Contributed to distributed systems performance improvements
+      - Reviewed pull requests and mentored new contributors
+      - Published technical blog posts on system design
+
+education:
+  - degree: Bachelor of Science in Computer Science
+    institution: University of California
+    dates: 2010-2014
+    details: "GPA: 3.8/4.0, Dean's List all semesters"
+
+  - degree: AWS Solutions Architect Certification
+    institution: Amazon Web Services
+    dates: 2022
+    details: "Professional level certification"

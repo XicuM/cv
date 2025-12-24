@@ -1,0 +1,57 @@
+\documentclass[12pt,a4paper]{moderncv}
+
+% Packages
+\usepackage[$language$]{babel}      % Language
+\usepackage[utf8]{inputenc}         % Character encoding
+\usepackage{microtype}              % Improves text appearance
+\usepackage{ebgaramond}             % Font
+\usepackage{setspace}               % Line spacing
+\usepackage{tikz}                   % Drawing
+\usepackage{graphicx}               % Include images
+\usepackage{ragged2e}               % Justify text
+\usepackage{hyperref}               % Hyperlinks
+\usepackage[normalem]{ulem}         % Underline text
+\usepackage[
+    scale=0.75, 
+    top=1.7cm, 
+    bottom=1.7cm
+]{geometry}  % Page margins
+
+% Personal Information
+\name{$name$}{$surnames$}
+\phone[mobile]{$phone$}
+\email{$email$}
+\homepage{$webpage$}
+\opening{$lang_opening$}
+
+% moderncv theme
+\moderncvstyle{classic}
+
+% Draw the logo
+\setstretch{1.1}
+\recipient{
+    \begin{minipage}[c]{3mm}
+        \vspace{-2px} 
+        \begin{tikzpicture}
+            \clip[rounded corners=1mm] (0,0) rectangle (4mm,4mm);
+            \node[anchor=center, inner sep=0] at (2mm,2mm) {
+                \includegraphics[width=4mm]{../assets/logos/$logo$}
+            };
+        \end{tikzpicture}
+    \end{minipage}
+    \hspace{3px} \company
+}{}
+\date{\today}
+
+% Content
+\def\company{$company$}
+\def\position{$position$}
+\begin{document}
+    \vspace{1\baselineskip}
+    \makelettertitle
+    \justifying \\
+    $body$ \\
+    \vspace{1\baselineskip} 
+    $lang_ending$ \newline \newline
+    \includegraphics[width=2.5cm]{../assets/$signature$}
+\end{document}

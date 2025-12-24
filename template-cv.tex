@@ -1,0 +1,405 @@
+\documentclass[$style.fontsize$,a4paper]{article}
+
+% ----------------------------------------------------------------------
+% Required packages
+
+\usepackage{graphicx}       % To include images
+\usepackage{xcolor}         % To add colour to the document
+\usepackage{marvosym}       % Provides icons for the contact details
+\usepackage{fontawesome5}   % FontAwesome icons (includes material design style)
+\usepackage{enumitem}       % To redefine spacing in lists
+\usepackage[T1]{fontenc}    % Output font encoding
+\usepackage[utf8]{inputenc} % Input encoding
+\usepackage[scaled]{helvet} % Helvetica font
+\usepackage{tikz}           % For drawing badges
+\usepackage{tikzpagenodes}  % For page nodes
+\usepackage{background}     % For background colors and images
+\usepackage[
+    left=0mm, 
+    right=0mm, 
+    top=0mm, 
+    bottom=0mm
+]{geometry}                 % Page dimensions
+\usepackage[
+    stretch=25, 
+    shrink=25, 
+    tracking=true, 
+    letterspace=30
+]{microtype}                % Better typography
+\usepackage[
+    colorlinks=true, 
+    urlcolor=black, 
+    linkcolor=black
+]{hyperref}                 % For hyperlinks
+
+% Load TikZ libraries
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{backgrounds}
+
+% Declare layers
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background, main, foreground}
+
+% ----------------------------------------------------------------------
+% Custom commands
+
+% Custom blue bullet
+\newcommand{\bluebullet}{%
+    \hspace{0.1cm}%
+    \tikz[baseline=-0.14cm]{%
+        \fill[white] (0,0) circle (0.16cm);%
+        \fill[primary] (0,0) circle (0.08cm);%
+    }%
+}
+
+% Custom hollow bullet
+\newcommand{\hollowbullet}{%
+    \raisebox{0.04cm}{
+        \tikz[baseline=(char.base)]{
+            \draw[secondary] (0,0) circle (0.06cm);
+        }
+    }
+}
+
+% Date command
+\newcommand{\dates}[2]{%
+    \hfill\raisebox{0.04cm}{\footnotesize\color{primary}\textbf{#1 - #2}}%
+}
+
+% Section header for left column
+\newcommand{\headleft}[1]{%
+    \vspace*{0.4cm}\textsc{\textbf{#1}}\par%
+    \vspace*{-1.1ex}\hrulefill\par\vspace*{0.12cm}%
+}
+
+% Section header for right column
+\newcommand{\headright}[1]{%
+    \textsc{\Large\color{primary}#1}\par%
+    \vspace*{-0.25cm}{\color{primary}\hrulefill}\par%
+    \vspace*{0.25cm}%
+}
+
+% Counter for unique section identifiers
+\newcounter{sectioncounter}
+
+% Counter for unique subposition identifiers
+\newcounter{subposcounter}
+
+% Section with vertical line
+\newcommand{\newsection}[2]{%
+    \stepcounter{sectioncounter}%
+    \headright{#1}%
+    \tikzmark{start-\arabic{sectioncounter}}%
+    #2%
+    \tikzmark{end-\arabic{sectioncounter}}%
+    \begin{tikzpicture}[remember picture, overlay]%
+        \coordinate (line-start-\arabic{sectioncounter}) at ([xshift=0.25cm,yshift=0cm]pic cs:start-\arabic{sectioncounter});%
+        \coordinate (line-end-\arabic{sectioncounter}) at ([xshift=0.25cm,yshift=0.7cm]pic cs:end-\arabic{sectioncounter});%
+    \end{tikzpicture}%
+}
+
+% Detail item command
+\newcommand{\detail}[1]{%
+    {\small\color{secondary}#1}%
+}
+
+% Badge command
+\newcommand{\skillbadge}[1]{%
+    \tikz[baseline=(char.base)]{%
+        \node[%
+            shape=rectangle, %
+            rounded corners=3pt, %
+            inner sep=2pt, %
+            fill=primary!10%
+        ] (char) {\small\textbf{#1}};%
+    }%
+}
+
+% Circular image command with diffused shadow
+\newcommand{\circularimage}[2][3cm]{%
+    \begin{tikzpicture}%
+        % Diffused shadow
+        \fill[black!15] (0.08,-0.08) circle (#1/2 + 0.3mm);%
+        \fill[black!20] (0.06,-0.06) circle (#1/2 + 0.2mm);%
+        \fill[black!25] (0.04,-0.04) circle (#1/2 + 0.1mm);%
+        \fill[black!30] (0.02,-0.02) circle (#1/2);%
+        % Main circular image
+        \begin{scope}%
+            \clip (0,0) circle (#1/2);%
+            \node[anchor=center] at (0,0) {\includegraphics[width=#1]{#2}};%
+        \end{scope}%
+    \end{tikzpicture}%
+}
+
+% ----------------------------------------------------------------------
+% Set style
+
+% Colors
+\definecolor{primary}{HTML}{$colors.primary$}
+\definecolor{secondary}{HTML}{$colors.secondary$}
+
+% Set sans-serif as the default font family
+\renewcommand{\familydefault}{\sfdefault}
+
+% List settings
+\setlist{
+    parsep=0pt, 
+    topsep=0pt, 
+    partopsep=0pt, 
+    itemsep=0.1cm, 
+    leftmargin=1cm,
+    labelsep=0cm,
+    label=\hollowbullet
+}
+
+% Margins
+\newlength{\rightcolumnleftmargin}\setlength{\rightcolumnleftmargin}{0.5cm}
+\newlength{\rightcolumnrightmargin}\setlength{\rightcolumnrightmargin}{0.5cm}
+\newlength{\leftcolumnleftmargin}\setlength{\leftcolumnleftmargin}{0.6cm}
+\newlength{\leftcolumnrightmargin}\setlength{\leftcolumnrightmargin}{0.5cm}
+
+% Page background (including colored left column and vertical timeline)
+\backgroundsetup{
+    scale=1,
+    angle=0,
+    opacity=1,
+    contents={
+    \ifnum\value{page}=1%
+        \begin{tikzpicture}[remember picture,overlay]%
+            \fill[primary!20]%
+                (current page.north west) rectangle ([xshift=0.33\paperwidth]current page.south west);%
+            \begin{pgfonlayer}{background}%
+                \foreach \n in {1,...,\value{sectioncounter}}{%
+                    \draw[primary!30, line width=2.6pt] (line-start-\n) -- (line-end-\n);%
+                }%
+            \end{pgfonlayer}%
+        \end{tikzpicture}%
+    \fi%
+  }%
+}
+
+% No indentation, no paragraph spacing, no box padding
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\fboxsep}{0pt}
+
+% ----------------------------------------------------------------------
+% Main document
+ 
+\begin{document}%
+    \begin{tabular}{%
+        @{}p{0.33\textwidth}@{\hskip0.01\textwidth}p{0.63\textwidth}@{}%
+    }%
+        % --------------------------------------------------------------
+        % Left column
+
+        \hspace{\leftcolumnleftmargin}%
+        \begin{minipage}[t]{%
+            \dimexpr0.325\textwidth-2\leftcolumnleftmargin%
+        }%
+            \raggedright%
+            \vspace*{0.9cm}%
+
+            \begin{center}
+
+                % Profile picture
+                $if(assets.picture)$%
+                    \circularimage[4.5cm]{../assets/$assets.picture$} \\[0.3cm]
+                $endif$
+
+                % Signature
+                $if(assets.signature)$%
+                    \includegraphics[
+                        width=$assets.signature_width$
+                    ]{../assets/$assets.signature$} \\[0.2cm]
+                $endif$
+
+                % Name
+                $if(name)$%
+                    \large \textbf{$name$}
+                $endif$
+            \end{center}
+
+            % Profile summary
+            $if(profile)$%
+                \headleft{$lang_profile$}
+                $profile$
+            $endif$
+
+            % ----------------------------------------------------------
+            % Contact details
+
+            \headleft{$lang_contact$}
+            {%
+                \small%
+
+                % Location
+                $if(contact.location)$%
+                    \faMapMarker\ \ $contact.location$ \\[0.5ex]
+                $endif$%
+
+                % Email
+                $if(contact.email)$%
+                    \faEnvelope\ \ {\small \href{mailto:$contact.email$}{$contact.email$}} \\[0.5ex]
+                $endif$%
+
+                % Phone
+                $if(contact.phone)$%
+                    \faPhone\ \ $contact.phone$ \\[0.5ex]
+                $endif$%
+
+                % LinkedIn
+                $if(contact.linkedin)$%
+                    \faLinkedin\ \ \href{https://$contact.linkedin$}{$contact.linkedin$} \\[0.5ex]
+                $endif$%
+
+                % GitHub
+                $if(contact.github)$%
+                    \faGithub\ \ \href{https://$contact.github$}{$contact.github$} \\[0.5ex]
+                $endif$%
+
+                % Website
+                $if(contact.website)$%
+                    \faGlobe\ \ \href{https://$contact.website$}{$contact.website$} \\[0.5ex]
+                $endif$%
+            }
+
+            % ----------------------------------------------------------
+            % Personal information
+
+            \headleft{$lang_personal_info$}
+            {%
+                % Birthdate
+                $if(personal_info.birthdate)$%
+                    $lang_birthdate$: \textbf{$personal_info.birthdate$} \\[0.5ex]
+                $endif$
+
+                % Place of birth
+                $if(personal_info.place_of_birth)$%
+                    $lang_place_of_birth$: \textbf{$personal_info.place_of_birth$} \\[0.5ex]
+                $endif$
+
+                % Citizenship
+                $if(personal_info.citizenship)$%
+                    $lang_citizenship$: \textbf{$personal_info.citizenship$} \\[0.5ex]
+                $endif$%
+
+                % Languages
+                $lang_languages$:
+                \begin{itemize}[leftmargin=0.4cm, itemsep=0pt, label=-\ ]
+                    $for(personal_info.languages)$
+                        \item \textbf{$it.name$}~($it.level$)
+                    $endfor$
+                \end{itemize} \\[0.5ex]
+
+                % Extra personal info
+                $if(personal_info.extra)$
+                    $for(personal_info.extra)$
+                        $it$\\[0.5ex]
+                    $endfor$%
+                $endif$%
+            }
+            
+            % ----------------------------------------------------------
+            % Key skills
+
+            $if(key_skills)$\headleft{$lang_key_skills$}{
+                \vspace*{0.2cm}%
+                \parbox{\linewidth}{%
+                    \raggedright \linespread{1.15}\selectfont%
+                    $for(key_skills)$\skillbadge{$it$} $endfor$%
+                }%
+            }
+            $endif$
+
+        \end{minipage} &
+
+        % --------------------------------------------------------------
+        % Right column
+
+        \setlength{\parskip}{0.25ex}%
+        \hspace{\rightcolumnleftmargin}%
+        \begin{minipage}[t]{%
+            \dimexpr0.63\textwidth-\rightcolumnleftmargin-\rightcolumnrightmargin%
+        }%
+            \raggedright%
+            \vspace*{0.9cm}%
+
+            % ----------------------------------------------------------
+            % Professional experience
+            
+            $if(professional_experience)$\newsection{$lang_professional_experience$} {%
+                $for(professional_experience)$%
+                    % Position, company, location and dates
+                    \bluebullet\ \ \textsc{$it.position$} \dates{$it.dates.start$}{$it.dates.end$} \\%
+                    \hspace{0.65cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]%
+                    % Position details
+                    $if(it.details)$
+                        \begin{itemize}%
+                            $for(it.details)$%
+                                \item \detail{$it$} \\
+                            $endfor$%
+                        \end{itemize}%
+                    $endif$%
+                    % Subpositions (for internal promotions or multiple roles in the same company)
+                    $if(it.subpositions)$%
+                        \\[0.13cm]
+                        $for(it.subpositions)$%
+                            \stepcounter{subposcounter}%
+                            \hspace{1cm}\tikzmark{start-subpos-\arabic{subposcounter}}%
+                            \textsc{$it.position$}\dates{$it.dates.start$}{$it.dates.end$} \\
+                            \hspace{1cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]%
+                            % Subposition details
+                            \begin{itemize}[leftmargin=1.5cm]
+                                $for(it.details)$%
+                                    \item \detail{$it$} \\
+                                $endfor$
+                            \end{itemize}%
+                            \tikzmark{end-subpos-\arabic{subposcounter}}\\[-0.25cm]
+                            % Set up coordinates for background drawing
+                            \begin{tikzpicture}[remember picture, overlay]%
+                                \coordinate (line-start-subpos-\arabic{subposcounter}) at ([xshift=-0.3cm, yshift=0.3cm]pic cs:start-subpos-\arabic{subposcounter});%
+                                \coordinate (line-end-subpos-\arabic{subposcounter}) at ([xshift=0.7cm, yshift=0.45cm]pic cs:end-subpos-\arabic{subposcounter});%
+                                \draw[primary!30, line width=1.8pt] (line-start-subpos-\arabic{subposcounter}) -- (line-end-subpos-\arabic{subposcounter});%
+                            \end{tikzpicture}%
+                        $endfor$%
+                        \vspace{-0.7cm}
+                    $endif$ \\[0.3cm]
+                $endfor$%
+            }%
+            $endif$
+
+            % Additional experience (projects, internships, volunteering, etc.)
+            $if(additional_experience)$\newsection{$lang_additional_experience$} {%
+                $for(additional_experience)$%
+                    \bluebullet\ \ \textsc{$it.position$} \dates{$it.dates.start$}{$it.dates.end$} \\%
+                    \hspace{0.65cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]%
+                    \begin{itemize}%
+                        $for(it.details)$%
+                            \item \detail{$it$} \\%
+                        $endfor$%
+                    \end{itemize}%
+                    \vspace{0.3cm}%
+                $endfor$%
+            }
+            $endif$
+            
+            % Education
+            $if(education)$\newsection{$lang_education$} {%
+                $for(education)$%
+                    \bluebullet\ \ \textsc{$it.degree$} \dates{$it.dates.start$}{$it.dates.end$} \\%
+                    \hspace{0.65cm}$it.institution$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]%
+                    \begin{itemize}%
+                        $for(it.details)$%
+                            \item \detail{$it$} \\%
+                        $endfor$%
+                    \end{itemize}%
+                    \vspace{0.3cm}%
+                $endfor$%
+            }
+            $endif$
+
+            \end{minipage}%
+    \end{tabular}%
+\end{document}

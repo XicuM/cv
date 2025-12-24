@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Build Current CV",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/.vscode/selector.py",
+            "args": ["${file}"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

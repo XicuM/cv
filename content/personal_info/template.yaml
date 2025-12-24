@@ -1,0 +1,16 @@
+name: Jane
+surnames: Smith
+phone: +1 (555) 123-4567
+email: jane.smith@example.com
+webpage: janesmith.dev
+signature: Jane Smith
+contacts:
+  - alias: linkedin
+    name: LinkedIn Profile
+    link: linkedin.com/in/janesmith
+  - alias: github
+    name: GitHub Profile
+    link: github.com/janesmith
+  - alias: twitter
+    name: Twitter
+    link: twitter.com/janesmith_dev

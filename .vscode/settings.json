@@ -1,0 +1,21 @@
+{
+    "code-runner.executorMap": {
+        "yaml": "python .vscode/selector.py $fullFileName",
+        "tex": "python .vscode/selector.py $fullFileName",
+        "latex": "python .vscode/selector.py $fullFileName"
+    },
+    "code-runner.runInTerminal": true,
+    "code-runner.saveFileBeforeRun": true,
+    "code-runner.preserveFocus": false,
+    "code-runner.clearPreviousOutput": true,
+    "files.associations": {
+        "*.yaml": "yaml",
+        "*.tex": "latex",
+        "SConstruct": "python"
+    },
+    // Disable LaTeX Workshop auto-build
+    "latex-workshop.latex.autoBuild.run": "never",
+    // Disable automatic builds on file save for LaTeX
+    "latex-workshop.view.pdf.viewer": "tab",
+    "latex-workshop.synctex.afterBuild.enabled": false
+}

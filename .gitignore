@@ -1,0 +1,14 @@
+build/
+.sconsign.dblite
+content/*
+!content/cv/
+content/cv/*
+!content/cv/template.yaml
+!content/letters/
+content/letters/*
+!content/letters/template.yaml
+!content/personal_info/
+content/personal_info/*
+!content/personal_info/template.yaml
+assets/*
+!assets/**/template*

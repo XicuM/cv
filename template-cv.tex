@@ -205,14 +205,14 @@
 
                 % Profile picture
                 $if(assets.picture)$%
-                    \circularimage[4.5cm]{../assets/$assets.picture$} \\[0.3cm]
+                    \circularimage[3.8cm]{../../../assets/$assets.picture$} \\[0.3cm]
                 $endif$
 
                 % Signature
                 $if(assets.signature)$%
                     \includegraphics[
                         width=$assets.signature_width$
-                    ]{../assets/$assets.signature$} \\[0.2cm]
+                    ]{../../../assets/$assets.signature$} \\[0.2cm]
                 $endif$
 
                 % Name
@@ -291,7 +291,7 @@
                     $for(personal_info.languages)$
                         \item \textbf{$it.name$}~($it.level$)
                     $endfor$
-                \end{itemize} \\[0.5ex]
+                \end{itemize} \par\vspace{0.5ex}
 
                 % Extra personal info
                 $if(personal_info.extra)$
@@ -338,7 +338,7 @@
                     $if(it.details)$
                         \begin{itemize}%
                             $for(it.details)$%
-                                \item \detail{$it$} \\
+                                \item \detail{$it$} 
                             $endfor$%
                         \end{itemize}%
                     $endif$%
@@ -348,12 +348,12 @@
                         $for(it.subpositions)$%
                             \stepcounter{subposcounter}%
                             \hspace{1cm}\tikzmark{start-subpos-\arabic{subposcounter}}%
-                            \textsc{$it.position$}\dates{$it.dates.start$}{$it.dates.end$} \\
-                            \hspace{1cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]%
+                            \textsc{$it.position$}\dates{$it.dates.start$}{$it.dates.end$} $if(it.company)$ \\%
+                            \hspace{1cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]$else$\\[0.1cm]$endif$%
                             % Subposition details
                             \begin{itemize}[leftmargin=1.5cm]
                                 $for(it.details)$%
-                                    \item \detail{$it$} \\
+                                    \item \detail{$it$} 
                                 $endfor$
                             \end{itemize}%
                             \tikzmark{end-subpos-\arabic{subposcounter}}\\[-0.25cm]
@@ -373,14 +373,41 @@
             % Additional experience (projects, internships, volunteering, etc.)
             $if(additional_experience)$\newsection{$lang_additional_experience$} {%
                 $for(additional_experience)$%
+                    % Position, company, location and dates
                     \bluebullet\ \ \textsc{$it.position$} \dates{$it.dates.start$}{$it.dates.end$} \\%
                     \hspace{0.65cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]%
-                    \begin{itemize}%
-                        $for(it.details)$%
-                            \item \detail{$it$} \\%
+                    % Position details
+                    $if(it.details)$
+                        \begin{itemize}%
+                            $for(it.details)$%
+                                \item \detail{$it$} 
+                            $endfor$%
+                        \end{itemize}%
+                    $endif$%
+                    % Subpositions (for internal promotions or multiple roles in the same company)
+                    $if(it.subpositions)$%
+                        \\[0.13cm]
+                        $for(it.subpositions)$%
+                            \stepcounter{subposcounter}%
+                            \hspace{1cm}\tikzmark{start-subpos-\arabic{subposcounter}}%
+                            \textsc{$it.position$}\dates{$it.dates.start$}{$it.dates.end$} $if(it.company)$ \\%
+                            \hspace{1cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]$else$\\[0.1cm]$endif$%
+                            % Subposition details
+                            \begin{itemize}[leftmargin=1.5cm]
+                                $for(it.details)$%
+                                    \item \detail{$it$} 
+                                $endfor$
+                            \end{itemize}%
+                            \tikzmark{end-subpos-\arabic{subposcounter}}\\[-0.25cm]
+                            % Set up coordinates for background drawing
+                            \begin{tikzpicture}[remember picture, overlay]%
+                                \coordinate (line-start-subpos-\arabic{subposcounter}) at ([xshift=-0.3cm, yshift=0.3cm]pic cs:start-subpos-\arabic{subposcounter});%
+                                \coordinate (line-end-subpos-\arabic{subposcounter}) at ([xshift=0.7cm, yshift=0.45cm]pic cs:end-subpos-\arabic{subposcounter});%
+                                \draw[primary!30, line width=1.8pt] (line-start-subpos-\arabic{subposcounter}) -- (line-end-subpos-\arabic{subposcounter});%
+                            \end{tikzpicture}%
                         $endfor$%
-                    \end{itemize}%
-                    \vspace{0.3cm}%
+                        \vspace{-0.7cm}
+                    $endif$ \\[0.3cm]
                 $endfor$%
             }
             $endif$
@@ -390,11 +417,13 @@
                 $for(education)$%
                     \bluebullet\ \ \textsc{$it.degree$} \dates{$it.dates.start$}{$it.dates.end$} \\%
                     \hspace{0.65cm}$it.institution$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]%
+                    $if(it.details)$
                     \begin{itemize}%
                         $for(it.details)$%
-                            \item \detail{$it$} \\%
+                            \item \detail{$it$} %
                         $endfor$%
                     \end{itemize}%
+                    $endif$
                     \vspace{0.3cm}%
                 $endfor$%
             }

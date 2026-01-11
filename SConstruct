@@ -91,7 +91,7 @@ def pdf_from_tex(target, source, env):
         return 1
 
 def clean_build_files(target, source, env):
-    """Clean all generated build files including auxiliary files"""
+    '''Clean all generated build files including auxiliary files'''
     build_dir = Path('build')
     if build_dir.exists():
         print(f"Cleaning build directory: {build_dir}")
@@ -115,74 +115,85 @@ all_pdfs = []
 
 # Get available language codes
 i18n_files = Glob('i18n/*.yaml')
-language_codes = [os.path.splitext(os.path.basename(str(f)))[0] for f in i18n_files]
+lang_codes = [os.path.splitext(os.path.basename(str(f)))[0] for f in i18n_files]
 
-# For each YAML file in 'content' directory
-for yaml_file in Glob('content/cv/*.yaml'):
+# Collect content YAML files and resolve per-language overrides
+content_files = Glob('content/cv/*.yaml')
 
-    # Get base name without extension
-    base_name = os.path.splitext(os.path.basename(str(yaml_file)))[0]
+# Map base CV name -> generic content file (no language suffix)
+generic_files = {}
 
-    # Build default version (no language suffix) - original behavior
-    tex_target = env.BuildTex(f'build/cv-{base_name}.tex', yaml_file)
-    pdf_target = env.BuildPdf(f'build/cv-{base_name}.pdf', tex_target)
-    
-    # Create an alias for easy building
-    env.Alias(base_name, pdf_target)
-    all_pdfs.append(pdf_target)
+# Map (base CV name, language code) -> language-specific content file
+overrides = {}
 
-    # Define dependencies
-    env.Depends(tex_target, 'template-cv.tex')
-    env.Depends(tex_target, yaml_file)
-    
-    # Add auxiliary files to clean list for scons -c
-    aux_files = [
-        f'build/cv-{base_name}.aux',
-        f'build/cv-{base_name}.log', 
-        f'build/cv-{base_name}.out'
-    ]
-    env.Clean(pdf_target, aux_files)
+# Set of all base CV names
+bases = set()
 
-    # Build language variants
-    for lang_code in language_codes:
+for yaml_file in content_files:
+    stem = Path(str(yaml_file)).stem
+    parts = stem.rsplit('-', 1)
+    if len(parts) == 2 and parts[1] in lang_codes:
+        base_name, lang = parts
+        overrides[(base_name, lang)] = yaml_file
+        bases.add(base_name)
+    else:
+        base_name = stem
+        generic_files[base_name] = yaml_file
+        bases.add(base_name)
+
+# For each base CV name, build available language variants
+for base in sorted(bases):
+
+    base_targets = []
+
+    for lang_code in lang_codes:
+        # Prefer language-specific content YAML if it exists, otherwise fallback to generic
+        content_yaml = overrides.get((base, lang_code), generic_files.get(base))
+        if not content_yaml: continue
+
         # Create combined YAML file in build directory
-        combined_yaml = f'build/cv-{base_name}-{lang_code}.yaml'
+        build_dir = f'build/{base}/{lang_code}'
+        combined_yaml = f'{build_dir}/cv.yaml'
         i18n_file = f'i18n/{lang_code}.yaml'
         
         # Create a custom command to combine YAML files
-        def create_combine_action(content_file, i18n_file, output_file):
-            def combine_action(target, source, env):
-                return 0 if combine_yaml_files(content_file, i18n_file, str(target[0])) else 1
-            return combine_action
+        def create_combine_action(content, i18n):
+            return lambda target, source, env: (
+                0 if combine_yaml_files(content, i18n, str(target[0])) else 1
+            )
         
         # Build the combined YAML file
         combined_target = env.Command(
             combined_yaml, 
-            [yaml_file, i18n_file],
-            create_combine_action(str(yaml_file), i18n_file, combined_yaml)
+            [content_yaml, i18n_file],
+            create_combine_action(str(content_yaml), i18n_file)
         )
         
         # Build LaTeX and PDF from combined YAML
-        tex_target_lang = env.BuildTex(f'build/cv-{base_name}-{lang_code}.tex', combined_target)
-        pdf_target_lang = env.BuildPdf(f'build/cv-{base_name}-{lang_code}.pdf', tex_target_lang)
+        tex_target_lang = env.BuildTex(f'{build_dir}/cv.tex', combined_target)
+        pdf_target_lang = env.BuildPdf(f'{build_dir}/cv.pdf', tex_target_lang)
         
         # Create alias for language variant
-        env.Alias(f'{base_name}-{lang_code}', pdf_target_lang)
+        alias_name = f'{base}-{lang_code}'
+        env.Alias(alias_name, pdf_target_lang)
         all_pdfs.append(pdf_target_lang)
+        base_targets.append(pdf_target_lang)
         
         # Define dependencies
         env.Depends(tex_target_lang, 'template-cv.tex')
-        env.Depends(combined_target, yaml_file)
+        env.Depends(combined_target, content_yaml)
         env.Depends(combined_target, i18n_file)
         
         # Add auxiliary files to clean list
-        aux_files_lang = [
-            f'build/cv-{base_name}-{lang_code}.aux',
-            f'build/cv-{base_name}-{lang_code}.log',
-            f'build/cv-{base_name}-{lang_code}.out',
+        env.Clean(pdf_target_lang, [
+            f'{build_dir}/cv.aux',
+            f'{build_dir}/cv.log',
+            f'{build_dir}/cv.out',
             combined_yaml
-        ]
-        env.Clean(pdf_target_lang, aux_files_lang)
+        ])
+
+    # Alias for building all languages for this specific CV
+    env.Alias(base, base_targets)
 
 # Also add the build directory itself to be cleaned by scons -c
 env.Clean('.', 'build/')
@@ -196,11 +207,11 @@ CV Build System with Language Support using SCons
 
 Targets:
   scons                   - Build all CVs (all content files, all languages)
-  scons *                 - Build CV from content/cv/*.yaml (default language)
-  scons *-<lang>          - Build CV with specific language (e.g., automotive-es)
+  scons <name>            - Build CV for all languages (e.g., scons hardware)
+  scons <name>-<lang>     - Build CV with specific language (e.g., scons hardware-en)
   scons -c                - Remove all generated build files (SCons clean)
 
-Available languages: {', '.join(language_codes) if language_codes else 'none'}
+Available languages: {', '.join(lang_codes) if lang_codes else 'none'}
 
 Input files:
   content/cv/*.yaml       - CV content files
@@ -208,10 +219,5 @@ Input files:
   template-cv.tex         - LaTeX template for CVs
 
 Output:
-  build/cv-*.pdf          - Generated PDFs
-  build/cv-*.tex          - Generated LaTeX files
-  build/cv-*.yaml         - Combined YAML files (for language variants)
-  build/cv-*.aux          - Auxiliary LaTeX files
-  build/cv-*.log          - LaTeX log files
-  build/cv-*.out          - LaTeX outline files
+  build/<name>/<lang>/cv.pdf  - Generated PDFs
 """)

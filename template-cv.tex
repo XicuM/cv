@@ -46,7 +46,7 @@
 
 % Custom blue bullet
 \newcommand{\bluebullet}{%
-    \hspace{0.1cm}%
+    \hspace{0.09cm}%
     \tikz[baseline=-0.14cm]{%
         \fill[white] (0,0) circle (0.16cm);%
         \fill[primary] (0,0) circle (0.08cm);%
@@ -55,16 +55,62 @@
 
 % Custom hollow bullet
 \newcommand{\hollowbullet}{%
-    \raisebox{0.04cm}{
-        \tikz[baseline=(char.base)]{
-            \draw[secondary] (0,0) circle (0.06cm);
-        }
-    }
+    \makebox[0pt][l]{%
+        \hspace{-0.4cm}%
+        \raisebox{0.04cm}{%
+            \tikz[baseline=(char.base)]{%
+                \draw[secondary] (0,0) circle (0.06cm);%
+            }%
+        }%
+    }%
 }
 
 % Date command
 \newcommand{\dates}[2]{%
     \hfill\raisebox{0.04cm}{\footnotesize\color{primary}\textbf{#1 - #2}}%
+}
+
+% Reusable boxes to measure wrapped title height
+\newsavebox{\entrytitlebox}
+\newsavebox{\subentrytitlebox}
+
+% Entry header with wrapped title and fixed date column
+\newcommand{\entryheader}[3]{%
+    \sbox{\entrytitlebox}{\parbox[t]{0.60\linewidth}{\raggedright\textsc{#1}}}%
+    \noindent\makebox[0pt][l]{\bluebullet\hspace{0.20cm}}%
+    \hspace{0.65cm}%
+    \begin{minipage}[t]{0.60\linewidth}%
+        \usebox{\entrytitlebox}%
+    \end{minipage}%
+    \hfill%
+    \hspace{0.06cm}%
+    \begin{minipage}[t]{0.27\linewidth}%
+        \raggedleft\raisebox{0.04cm}{\footnotesize\color{primary}\textbf{#2 - #3}}%
+    \end{minipage}\par%
+    \ifdim\dimexpr\ht\entrytitlebox+\dp\entrytitlebox\relax>1.6\baselineskip
+        \vspace{0.85ex}%
+    \else
+        \vspace{0.18ex}%
+    \fi%
+}
+
+% Sub-entry header with wrapped title and fixed date column
+\newcommand{\subentryheader}[3]{%
+    \sbox{\subentrytitlebox}{\parbox[t]{0.56\linewidth}{\raggedright\textsc{#1}}}%
+    \noindent\hspace{1cm}%
+    \begin{minipage}[t]{0.56\linewidth}%
+        \usebox{\subentrytitlebox}%
+    \end{minipage}%
+    \hfill%
+    \hspace{0.10cm}%
+    \begin{minipage}[t]{0.27\linewidth}%
+        \raggedleft\raisebox{0.04cm}{\footnotesize\color{primary}\textbf{#2 - #3}}%
+    \end{minipage}\par%
+    \ifdim\dimexpr\ht\subentrytitlebox+\dp\subentrytitlebox\relax>1.6\baselineskip
+        \vspace{0.75ex}%
+    \else
+        \vspace{0.18ex}%
+    \fi%
 }
 
 % Section header for left column
@@ -73,9 +119,15 @@
     \vspace*{-1.1ex}\hrulefill\par\vspace*{0.12cm}%
 }
 
+% Tighter first section header (used below the name block)
+\newcommand{\headleftfirst}[1]{%
+    \vspace*{0.16cm}\textsc{\textbf{#1}}\par%
+    \vspace*{-1.1ex}\hrulefill\par\vspace*{0.12cm}%
+}
+
 % Section header for right column
 \newcommand{\headright}[1]{%
-    \textsc{\Large\color{primary}#1}\par%
+    \textsc{\large\color{primary}#1}\par%
     \vspace*{-0.25cm}{\color{primary}\hrulefill}\par%
     \vspace*{0.25cm}%
 }
@@ -92,16 +144,50 @@
     \headright{#1}%
     \tikzmark{start-\arabic{sectioncounter}}%
     #2%
+    \par\noindent%
     \tikzmark{end-\arabic{sectioncounter}}%
     \begin{tikzpicture}[remember picture, overlay]%
         \coordinate (line-start-\arabic{sectioncounter}) at ([xshift=0.25cm,yshift=0cm]pic cs:start-\arabic{sectioncounter});%
-        \coordinate (line-end-\arabic{sectioncounter}) at ([xshift=0.25cm,yshift=0.7cm]pic cs:end-\arabic{sectioncounter});%
+        \coordinate (line-end-\arabic{sectioncounter}) at ([xshift=0.25cm,yshift=0.75cm]pic cs:end-\arabic{sectioncounter});%
     \end{tikzpicture}%
 }
 
 % Detail item command
 \newcommand{\detail}[1]{%
     {\small\color{secondary}#1}%
+}
+
+% Company/location line for entries and sub-entries
+\newcommand{\companyline}[3]{%
+    \hspace{#1}#2#3 \\[0.1cm]%
+}
+
+% Reusable details list with configurable left margin
+\newcommand{\detailslist}[2][1.12cm]{%
+    \begin{itemize}[leftmargin=#1]%
+        #2%
+    \end{itemize}%
+}
+
+% Draw vertical line for a sub-position timeline
+\newcommand{\drawsubpositionline}[2]{%
+    \begin{tikzpicture}[remember picture, overlay]%
+        \coordinate (line-start-subpos-\arabic{subposcounter}) at ([xshift=0.70cm, yshift=#1]pic cs:start-subpos-\arabic{subposcounter});%
+        \coordinate (line-end-subpos-\arabic{subposcounter}) at ([xshift=0.70cm, yshift=#2]pic cs:end-subpos-\arabic{subposcounter});%
+        \draw[primary!30, line width=1.8pt] (line-start-subpos-\arabic{subposcounter}) -- (line-end-subpos-\arabic{subposcounter});%
+    \end{tikzpicture}%
+}
+
+% Reusable subposition block
+\newcommand{\subpositionentry}[7]{%
+    \stepcounter{subposcounter}%
+    \tikzmark{start-subpos-\arabic{subposcounter}}%
+    \subentryheader{#1}{#2}{#3}%
+    #4%
+    \detailslist[1.5cm]{#5}%
+    \tikzmark{end-subpos-\arabic{subposcounter}}%
+    \par\vspace{-0.25cm}%
+    \drawsubpositionline{#6}{#7}%
 }
 
 % Badge command
@@ -116,8 +202,13 @@
     }%
 }
 
+% Skill category label
+\newcommand{\skillcategory}[1]{%
+    {\small\textit{#1}}\\%
+}
+
 % Circular image command with diffused shadow
-\newcommand{\circularimage}[2][3cm]{%
+\newcommand{\circularimage}[2][2.5cm]{%
     \begin{tikzpicture}%
         % Diffused shadow
         \fill[black!15] (0.08,-0.08) circle (#1/2 + 0.3mm);%
@@ -139,6 +230,9 @@
 \definecolor{primary}{HTML}{$colors.primary$}
 \definecolor{secondary}{HTML}{$colors.secondary$}
 
+% Make links use the same tone as detail text
+\hypersetup{urlcolor=secondary, linkcolor=secondary}
+
 % Set sans-serif as the default font family
 \renewcommand{\familydefault}{\sfdefault}
 
@@ -148,7 +242,7 @@
     topsep=0pt, 
     partopsep=0pt, 
     itemsep=0.1cm, 
-    leftmargin=1cm,
+    leftmargin=1.12cm,
     labelsep=0cm,
     label=\hollowbullet
 }
@@ -165,7 +259,6 @@
     angle=0,
     opacity=1,
     contents={
-    \ifnum\value{page}=1%
         \begin{tikzpicture}[remember picture,overlay]%
             \fill[primary!20]%
                 (current page.north west) rectangle ([xshift=0.33\paperwidth]current page.south west);%
@@ -175,7 +268,6 @@
                 }%
             \end{pgfonlayer}%
         \end{tikzpicture}%
-    \fi%
   }%
 }
 
@@ -188,7 +280,8 @@
 % Main document
  
 \begin{document}%
-    \begin{tabular}{%
+    \vspace*{-0.65cm}%
+    \noindent\begin{tabular}[t]{%
         @{}p{0.33\textwidth}@{\hskip0.01\textwidth}p{0.63\textwidth}@{}%
     }%
         % --------------------------------------------------------------
@@ -199,116 +292,91 @@
             \dimexpr0.325\textwidth-2\leftcolumnleftmargin%
         }%
             \raggedright%
-            \vspace*{0.9cm}%
+            \vspace*{0.75cm}%
 
             \begin{center}
 
-                % Profile picture
-                $if(assets.picture)$%
-                    \circularimage[3.8cm]{../../../assets/$assets.picture$} \\[0.3cm]
+                $if(assets.picture)$ % Profile picture %
+                    \circularimage[3.5cm]{../../../assets/$assets.picture$} \\[0.3cm]
                 $endif$
-
-                % Signature
-                $if(assets.signature)$%
+                $if(assets.signature)$ % Signature %
                     \includegraphics[
                         width=$assets.signature_width$
                     ]{../../../assets/$assets.signature$} \\[0.2cm]
                 $endif$
 
-                % Name
-                $if(name)$%
+                $if(name)$ % Name %
                     \large \textbf{$name$}
                 $endif$
             \end{center}
 
-            % Profile summary
-            $if(profile)$%
-                \headleft{$lang_profile$}
-                $profile$
+            $if(profile)$ % Profile summary %
+                \headleftfirst{$lang_profile$}
+                $for(profile)$ $profile$$sep$\\[0.8ex]$endfor$
             $endif$
 
-            % ----------------------------------------------------------
             % Contact details
-
             \headleft{$lang_contact$}
             {%
                 \small%
-
-                % Location
-                $if(contact.location)$%
+                $if(contact.location)$ % Location %
                     \faMapMarker\ \ $contact.location$ \\[0.5ex]
                 $endif$%
-
-                % Email
-                $if(contact.email)$%
+                $if(contact.email)$ % Email %
                     \faEnvelope\ \ {\small \href{mailto:$contact.email$}{$contact.email$}} \\[0.5ex]
                 $endif$%
-
-                % Phone
-                $if(contact.phone)$%
+                $if(contact.phone)$ % Phone %
                     \faPhone\ \ $contact.phone$ \\[0.5ex]
                 $endif$%
-
-                % LinkedIn
-                $if(contact.linkedin)$%
+                $if(contact.linkedin)$ % LinkedIn %
                     \faLinkedin\ \ \href{https://$contact.linkedin$}{$contact.linkedin$} \\[0.5ex]
                 $endif$%
-
-                % GitHub
-                $if(contact.github)$%
+                $if(contact.github)$ % GitHub %
                     \faGithub\ \ \href{https://$contact.github$}{$contact.github$} \\[0.5ex]
                 $endif$%
-
-                % Website
-                $if(contact.website)$%
+                $if(contact.website)$ % Website %
                     \faGlobe\ \ \href{https://$contact.website$}{$contact.website$} \\[0.5ex]
                 $endif$%
             }
 
-            % ----------------------------------------------------------
             % Personal information
-
             \headleft{$lang_personal_info$}
             {%
-                % Birthdate
-                $if(personal_info.birthdate)$%
+                $if(personal_info.birthdate)$ % Birthdate %
                     $lang_birthdate$: \textbf{$personal_info.birthdate$} \\[0.5ex]
                 $endif$
-
-                % Place of birth
-                $if(personal_info.place_of_birth)$%
+                $if(personal_info.place_of_birth)$ % Place of birth %
                     $lang_place_of_birth$: \textbf{$personal_info.place_of_birth$} \\[0.5ex]
                 $endif$
-
-                % Citizenship
-                $if(personal_info.citizenship)$%
+                $if(personal_info.citizenship)$ % Citizenship %
                     $lang_citizenship$: \textbf{$personal_info.citizenship$} \\[0.5ex]
                 $endif$%
-
-                % Languages
-                $lang_languages$:
+                $lang_languages$: \\[0.4ex] % Languages %
                 \begin{itemize}[leftmargin=0.4cm, itemsep=0pt, label=-\ ]
                     $for(personal_info.languages)$
                         \item \textbf{$it.name$}~($it.level$)
                     $endfor$
-                \end{itemize} \par\vspace{0.5ex}
-
-                % Extra personal info
-                $if(personal_info.extra)$
+                \end{itemize} \par\vspace{0.7ex}
+                $if(personal_info.extra)$ % Additional personal information %
                     $for(personal_info.extra)$
                         $it$\\[0.5ex]
                     $endfor$%
                 $endif$%
             }
             
-            % ----------------------------------------------------------
             % Key skills
-
             $if(key_skills)$\headleft{$lang_key_skills$}{
                 \vspace*{0.2cm}%
                 \parbox{\linewidth}{%
-                    \raggedright \linespread{1.15}\selectfont%
-                    $for(key_skills)$\skillbadge{$it$} $endfor$%
+                    \raggedright \linespread{1.08}\selectfont%
+                    $for(key_skills)$%
+                        $if(it.category)$%
+                            \skillcategory{$it.category$}%
+                            $for(it.items)$\skillbadge{$it$}\hspace{0.09cm}$endfor$\\[0.1cm]%
+                        $else$%
+                            \skillbadge{$it$}\hspace{0.09cm}%
+                        $endif$%
+                    $endfor$%
                 }%
             }
             $endif$
@@ -332,97 +400,79 @@
             $if(professional_experience)$\newsection{$lang_professional_experience$} {%
                 $for(professional_experience)$%
                     % Position, company, location and dates
-                    \bluebullet\ \ \textsc{$it.position$} \dates{$it.dates.start$}{$it.dates.end$} \\%
-                    \hspace{0.65cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]%
+                    \entryheader{$it.position$}{$it.dates.start$}{$it.dates.end$}%
+                    \companyline{0.65cm}{$it.company$}{$if(it.location)$ - \textit{$it.location$}$endif$}%
                     % Position details
                     $if(it.details)$
-                        \begin{itemize}%
-                            $for(it.details)$%
-                                \item \detail{$it$} 
-                            $endfor$%
-                        \end{itemize}%
+                        \detailslist{%
+                            $for(it.details)$ \item \detail{$it$} $endfor$%
+                        }%
                     $endif$%
                     % Subpositions (for internal promotions or multiple roles in the same company)
                     $if(it.subpositions)$%
-                        \\[0.13cm]
+                        \vspace{0.13cm}
                         $for(it.subpositions)$%
-                            \stepcounter{subposcounter}%
-                            \hspace{1cm}\tikzmark{start-subpos-\arabic{subposcounter}}%
-                            \textsc{$it.position$}\dates{$it.dates.start$}{$it.dates.end$} $if(it.company)$ \\%
-                            \hspace{1cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]$else$\\[0.1cm]$endif$%
-                            % Subposition details
-                            \begin{itemize}[leftmargin=1.5cm]
-                                $for(it.details)$%
-                                    \item \detail{$it$} 
-                                $endfor$
-                            \end{itemize}%
-                            \tikzmark{end-subpos-\arabic{subposcounter}}\\[-0.25cm]
-                            % Set up coordinates for background drawing
-                            \begin{tikzpicture}[remember picture, overlay]%
-                                \coordinate (line-start-subpos-\arabic{subposcounter}) at ([xshift=-0.3cm, yshift=0.3cm]pic cs:start-subpos-\arabic{subposcounter});%
-                                \coordinate (line-end-subpos-\arabic{subposcounter}) at ([xshift=0.7cm, yshift=0.45cm]pic cs:end-subpos-\arabic{subposcounter});%
-                                \draw[primary!30, line width=1.8pt] (line-start-subpos-\arabic{subposcounter}) -- (line-end-subpos-\arabic{subposcounter});%
-                            \end{tikzpicture}%
+                            \subpositionentry{$it.position$}{$it.dates.start$}{$it.dates.end$}{%
+                                $if(it.company)$%
+                                    \companyline{1cm}{$it.company$}{$if(it.location)$ - \textit{$it.location$}$endif$}%
+                                $else$%
+                                    \vspace{0.1cm}%
+                                $endif$%
+                            }{%
+                                $for(it.details)$ \item \detail{$it$} $endfor$
+                            }{0.3cm}{0.50cm}%
                         $endfor$%
-                        \vspace{-0.7cm}
-                    $endif$ \\[0.3cm]
+                        \vspace{-0.35cm}
+                    $endif$ $if(it.subpositions)$\vspace{0.08cm}$else$\vspace{0.3cm}$endif$
                 $endfor$%
             }%
             $endif$
-
+            
+            % ----------------------------------------------------------
             % Additional experience (projects, internships, volunteering, etc.)
+            
             $if(additional_experience)$\newsection{$lang_additional_experience$} {%
                 $for(additional_experience)$%
                     % Position, company, location and dates
-                    \bluebullet\ \ \textsc{$it.position$} \dates{$it.dates.start$}{$it.dates.end$} \\%
-                    \hspace{0.65cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]%
+                    \entryheader{$it.position$}{$it.dates.start$}{$it.dates.end$}%
+                    \companyline{0.65cm}{$it.company$}{$if(it.location)$ - \textit{$it.location$}$endif$}%
                     % Position details
                     $if(it.details)$
-                        \begin{itemize}%
-                            $for(it.details)$%
-                                \item \detail{$it$} 
-                            $endfor$%
-                        \end{itemize}%
+                        \detailslist{%
+                            $for(it.details)$ \item \detail{$it$} $endfor$%
+                        }%
                     $endif$%
                     % Subpositions (for internal promotions or multiple roles in the same company)
                     $if(it.subpositions)$%
-                        \\[0.13cm]
+                        \vspace{0.13cm}
                         $for(it.subpositions)$%
-                            \stepcounter{subposcounter}%
-                            \hspace{1cm}\tikzmark{start-subpos-\arabic{subposcounter}}%
-                            \textsc{$it.position$}\dates{$it.dates.start$}{$it.dates.end$} $if(it.company)$ \\%
-                            \hspace{1cm}$it.company$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]$else$\\[0.1cm]$endif$%
-                            % Subposition details
-                            \begin{itemize}[leftmargin=1.5cm]
-                                $for(it.details)$%
-                                    \item \detail{$it$} 
-                                $endfor$
-                            \end{itemize}%
-                            \tikzmark{end-subpos-\arabic{subposcounter}}\\[-0.25cm]
-                            % Set up coordinates for background drawing
-                            \begin{tikzpicture}[remember picture, overlay]%
-                                \coordinate (line-start-subpos-\arabic{subposcounter}) at ([xshift=-0.3cm, yshift=0.3cm]pic cs:start-subpos-\arabic{subposcounter});%
-                                \coordinate (line-end-subpos-\arabic{subposcounter}) at ([xshift=0.7cm, yshift=0.45cm]pic cs:end-subpos-\arabic{subposcounter});%
-                                \draw[primary!30, line width=1.8pt] (line-start-subpos-\arabic{subposcounter}) -- (line-end-subpos-\arabic{subposcounter});%
-                            \end{tikzpicture}%
+                            \subpositionentry{$it.position$}{$it.dates.start$}{$it.dates.end$}{%
+                                $if(it.company)$%
+                                    \companyline{1cm}{$it.company$}{$if(it.location)$ - \textit{$it.location$}$endif$}%
+                                $else$%
+                                    \vspace{0.1cm}%
+                                $endif$%
+                            }{%
+                                $for(it.details)$ \item \detail{$it$} $endfor$
+                            }{0.32cm}{0.42cm}%
                         $endfor$%
-                        \vspace{-0.7cm}
-                    $endif$ \\[0.3cm]
+                        \vspace{-0.35cm}
+                    $endif$ $if(it.subpositions)$\vspace{0.08cm}$else$\vspace{0.3cm}$endif$
                 $endfor$%
             }
             $endif$
             
+            % ----------------------------------------------------------
             % Education
+
             $if(education)$\newsection{$lang_education$} {%
                 $for(education)$%
-                    \bluebullet\ \ \textsc{$it.degree$} \dates{$it.dates.start$}{$it.dates.end$} \\%
-                    \hspace{0.65cm}$it.institution$ $if(it.location)$- \textit{$it.location$}$endif$ \\[0.1cm]%
+                    \entryheader{$it.degree$}{$it.dates.start$}{$it.dates.end$}%
+                    \companyline{0.65cm}{$it.institution$}{$if(it.location)$ - \textit{$it.location$}$endif$}%
                     $if(it.details)$
-                    \begin{itemize}%
-                        $for(it.details)$%
-                            \item \detail{$it$} %
-                        $endfor$%
-                    \end{itemize}%
+                    \detailslist{%
+                        $for(it.details)$ \item \detail{$it$} $endfor$%
+                    }%
                     $endif$
                     \vspace{0.3cm}%
                 $endfor$%

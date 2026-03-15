@@ -30,14 +30,20 @@ personal_info:
       level: Intermediate
 
 key_skills:
-  - Python
-  - JavaScript
-  - React
-  - AWS
-  - Docker
-  - PostgreSQL
-  - Git
-  - Agile
+  - category: Programming
+    items:
+      - Python
+      - JavaScript
+      - React
+  - category: Cloud & DevOps
+    items:
+      - AWS
+      - Docker
+      - PostgreSQL
+      - Git
+  - category: Methodologies
+    items:
+      - Agile
 
 professional_experience:
   - position: Senior Software Engineer

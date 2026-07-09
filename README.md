@@ -42,7 +42,7 @@ cv-cli content.yaml --output build/resume.pdf
 ```
 
 #### Options:
-- `-o, --output PATH`: (Required) Output path for the generated PDF.
+- `-o, --output PATH`: Output path for the generated PDF. If not specified, defaults to `<content_filename>.pdf` in the current working directory.
 - `-t, --template TEXT`: Specify a custom LaTeX template file or path (defaults to `template-cv.tex` or `template-letter.tex`).
 - `-l, --lang TEXT`: Language code (e.g. `en`, `es`, `ca`). If omitted, it is automatically inferred from the input filename (e.g. `template-en.yaml` -> `en`).
 

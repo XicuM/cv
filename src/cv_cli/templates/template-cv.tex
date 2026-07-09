@@ -1,4 +1,4 @@
-\documentclass[$style.fontsize$,a4paper]{article}
+\documentclass[$if(style.fontsize)$$style.fontsize$$else$10pt$endif$,a4paper]{article}
 
 % ----------------------------------------------------------------------
 % Required packages
@@ -13,7 +13,7 @@
 \usepackage[scaled]{helvet} % Helvetica font
 \usepackage{tikz}           % For drawing badges
 \usepackage{tikzpagenodes}  % For page nodes
-\usepackage{background}     % For background colors and images
+\usepackage{eso-pic}        % For background colors and images
 \usepackage[
     left=0mm, 
     right=0mm, 
@@ -77,20 +77,21 @@
 % Entry header with wrapped title and fixed date column
 \newcommand{\entryheader}[3]{%
     \sbox{\entrytitlebox}{\parbox[t]{0.60\linewidth}{\raggedright\textsc{#1}}}%
+    \typeout{DEBUG TITLE: #1, HEIGHT: \the\ht\entrytitlebox, DEPTH: \the\dp\entrytitlebox, THRESHOLD: \the\dimexpr1.3\baselineskip\relax}%
     \noindent\makebox[0pt][l]{\bluebullet\hspace{0.20cm}}%
     \hspace{0.65cm}%
     \begin{minipage}[t]{0.60\linewidth}%
-        \usebox{\entrytitlebox}%
+        \raggedright\textsc{#1}%
     \end{minipage}%
     \hfill%
     \hspace{0.06cm}%
     \begin{minipage}[t]{0.27\linewidth}%
         \raggedleft\raisebox{0.04cm}{\footnotesize\color{primary}\textbf{#2 - #3}}%
     \end{minipage}\par%
-    \ifdim\dimexpr\ht\entrytitlebox+\dp\entrytitlebox\relax>1.6\baselineskip
-        \vspace{0.85ex}%
+    \ifdim\dimexpr\ht\entrytitlebox+\dp\entrytitlebox\relax>1.3\baselineskip
+        \vspace{\dimexpr\ht\entrytitlebox+\dp\entrytitlebox-1.1\baselineskip+0.08cm\relax}%
     \else
-        \vspace{0.18ex}%
+        \vspace{0.08cm}%
     \fi%
 }
 
@@ -99,17 +100,17 @@
     \sbox{\subentrytitlebox}{\parbox[t]{0.56\linewidth}{\raggedright\textsc{#1}}}%
     \noindent\hspace{1cm}%
     \begin{minipage}[t]{0.56\linewidth}%
-        \usebox{\subentrytitlebox}%
+        \raggedright\textsc{#1}%
     \end{minipage}%
     \hfill%
     \hspace{0.10cm}%
     \begin{minipage}[t]{0.27\linewidth}%
         \raggedleft\raisebox{0.04cm}{\footnotesize\color{primary}\textbf{#2 - #3}}%
     \end{minipage}\par%
-    \ifdim\dimexpr\ht\subentrytitlebox+\dp\subentrytitlebox\relax>1.6\baselineskip
-        \vspace{0.75ex}%
+    \ifdim\dimexpr\ht\subentrytitlebox+\dp\subentrytitlebox\relax>1.3\baselineskip
+        \vspace{\dimexpr\ht\subentrytitlebox+\dp\subentrytitlebox-1.1\baselineskip+0.08cm\relax}%
     \else
-        \vspace{0.18ex}%
+        \vspace{0.08cm}%
     \fi%
 }
 
@@ -146,10 +147,6 @@
     #2%
     \par\noindent%
     \tikzmark{end-\arabic{sectioncounter}}%
-    \begin{tikzpicture}[remember picture, overlay]%
-        \coordinate (line-start-\arabic{sectioncounter}) at ([xshift=0.25cm,yshift=0cm]pic cs:start-\arabic{sectioncounter});%
-        \coordinate (line-end-\arabic{sectioncounter}) at ([xshift=0.25cm,yshift=0.75cm]pic cs:end-\arabic{sectioncounter});%
-    \end{tikzpicture}%
 }
 
 % Detail item command
@@ -159,7 +156,7 @@
 
 % Company/location line for entries and sub-entries
 \newcommand{\companyline}[3]{%
-    \hspace{#1}#2#3 \\[0.1cm]%
+    \hspace{#1}#2#3\par\vspace{0.1cm}%
 }
 
 % Reusable details list with configurable left margin
@@ -171,11 +168,14 @@
 
 % Draw vertical line for a sub-position timeline
 \newcommand{\drawsubpositionline}[2]{%
-    \begin{tikzpicture}[remember picture, overlay]%
-        \coordinate (line-start-subpos-\arabic{subposcounter}) at ([xshift=0.70cm, yshift=#1]pic cs:start-subpos-\arabic{subposcounter});%
-        \coordinate (line-end-subpos-\arabic{subposcounter}) at ([xshift=0.70cm, yshift=#2]pic cs:end-subpos-\arabic{subposcounter});%
-        \draw[primary!30, line width=1.8pt] (line-start-subpos-\arabic{subposcounter}) -- (line-end-subpos-\arabic{subposcounter});%
-    \end{tikzpicture}%
+    \vbox to 0pt{%
+        \begin{tikzpicture}[remember picture, overlay]%
+            \coordinate (line-start-subpos-\arabic{subposcounter}) at ([xshift=0.70cm, yshift=#1]pic cs:start-subpos-\arabic{subposcounter});%
+            \coordinate (line-end-subpos-\arabic{subposcounter}) at ([xshift=0.70cm, yshift=#2]pic cs:end-subpos-\arabic{subposcounter});%
+            \draw[primary!30, line width=1.8pt] (line-start-subpos-\arabic{subposcounter}) -- (line-end-subpos-\arabic{subposcounter});%
+        \end{tikzpicture}%
+        \vss%
+    }%
 }
 
 % Reusable subposition block
@@ -186,7 +186,7 @@
     #4%
     \detailslist[1.5cm]{#5}%
     \tikzmark{end-subpos-\arabic{subposcounter}}%
-    \par\vspace{-0.25cm}%
+    \par\vspace{-0.55cm}%
     \drawsubpositionline{#6}{#7}%
 }
 
@@ -227,8 +227,8 @@
 % Set style
 
 % Colors
-\definecolor{primary}{HTML}{$colors.primary$}
-\definecolor{secondary}{HTML}{$colors.secondary$}
+\definecolor{primary}{HTML}{$if(style.primary_color)$$style.primary_color$$else$000000$endif$}
+\definecolor{secondary}{HTML}{$if(style.secondary_color)$$style.secondary_color$$else$666666$endif$}
 
 % Make links use the same tone as detail text
 \hypersetup{urlcolor=secondary, linkcolor=secondary}
@@ -254,21 +254,18 @@
 \newlength{\leftcolumnrightmargin}\setlength{\leftcolumnrightmargin}{0.5cm}
 
 % Page background (including colored left column and vertical timeline)
-\backgroundsetup{
-    scale=1,
-    angle=0,
-    opacity=1,
-    contents={
-        \begin{tikzpicture}[remember picture,overlay]%
-            \fill[primary!20]%
-                (current page.north west) rectangle ([xshift=0.33\paperwidth]current page.south west);%
-            \begin{pgfonlayer}{background}%
-                \foreach \n in {1,...,\value{sectioncounter}}{%
-                    \draw[primary!30, line width=2.6pt] (line-start-\n) -- (line-end-\n);%
-                }%
-            \end{pgfonlayer}%
-        \end{tikzpicture}%
-  }%
+\AddToShipoutPictureBG{%
+    \begin{tikzpicture}[remember picture,overlay]%
+        \fill[primary!20]%
+            (current page.north west) rectangle ([xshift=0.33\paperwidth]current page.south west);%
+        \begin{pgfonlayer}{background}%
+            \foreach \n in {1,...,\value{sectioncounter}}{%
+                \draw[primary!30, line width=2.6pt] 
+                    ([xshift=0.25cm,yshift=0cm]pic cs:start-\n) -- 
+                    ([xshift=0.25cm,yshift=0.75cm]pic cs:end-\n);%
+            }%
+        \end{pgfonlayer}%
+    \end{tikzpicture}%
 }
 
 % No indentation, no paragraph spacing, no box padding
@@ -371,10 +368,19 @@
                     \raggedright \linespread{1.08}\selectfont%
                     $for(key_skills)$%
                         $if(it.category)$%
+                            % categorized, skip in first loop
+                        $else$%
+                            $if(it.items)$%
+                                $for(it.items)$\skillbadge{$it$}\hspace{0.09cm}$endfor$\\[0.1cm]%
+                            $else$%
+                                \skillbadge{$it$}\hspace{0.09cm}%
+                            $endif$%
+                        $endif$%
+                    $endfor$%
+                    $for(key_skills)$%
+                        $if(it.category)$%
                             \skillcategory{$it.category$}%
                             $for(it.items)$\skillbadge{$it$}\hspace{0.09cm}$endfor$\\[0.1cm]%
-                        $else$%
-                            \skillbadge{$it$}\hspace{0.09cm}%
                         $endif$%
                     $endfor$%
                 }%
@@ -422,7 +428,7 @@
                                 $for(it.details)$ \item \detail{$it$} $endfor$
                             }{0.3cm}{0.50cm}%
                         $endfor$%
-                        \vspace{-0.35cm}
+                        \vspace{-0.10cm}
                     $endif$ $if(it.subpositions)$\vspace{0.08cm}$else$\vspace{0.3cm}$endif$
                 $endfor$%
             }%
@@ -456,7 +462,7 @@
                                 $for(it.details)$ \item \detail{$it$} $endfor$
                             }{0.32cm}{0.42cm}%
                         $endfor$%
-                        \vspace{-0.35cm}
+                        \vspace{-0.10cm}
                     $endif$ $if(it.subpositions)$\vspace{0.08cm}$else$\vspace{0.3cm}$endif$
                 $endfor$%
             }

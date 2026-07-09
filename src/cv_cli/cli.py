@@ -8,13 +8,16 @@ from cv_cli.scons_helpers import get_resource_path, combine_yaml_files
 
 @click.command()
 @click.argument('content', type=click.Path(exists=True))
-@click.option('--output', '-o', required=True, type=click.Path(), help='Path to output PDF.')
+@click.option('--output', '-o', default=None, type=click.Path(), help='Path to output PDF. Defaults to <content_filename>.pdf in CWD.')
 @click.option('--template', '-t', default='template-cv.tex', help='LaTeX template filename or path.')
 @click.option('--lang', '-l', default=None, help='Language code (e.g. en, es, ca). Inferred from filename if not specified.')
 def main(content, output, template, lang):
     """Builds a PDF from YAML content and localization files."""
     content_path = Path(content).absolute()
-    output_path = Path(output).absolute()
+    if output:
+        output_path = Path(output).absolute()
+    else:
+        output_path = Path.cwd() / f"{content_path.stem}.pdf"
     
     # 1. Infer language if not specified
     if not lang:

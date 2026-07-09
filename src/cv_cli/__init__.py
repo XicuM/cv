@@ -3,6 +3,7 @@ from cv_cli.scons_helpers import (
     tex_from_yaml,
     pdf_from_tex,
     setup_cv_env,
+    configure_cv_build,
     get_resource_path
 )
 
@@ -11,5 +12,6 @@ __all__ = [
     'tex_from_yaml',
     'pdf_from_tex',
     'setup_cv_env',
+    'configure_cv_build',
     'get_resource_path'
 ]

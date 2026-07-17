@@ -294,12 +294,12 @@
             \begin{center}
 
                 $if(assets.picture)$ % Profile picture %
-                    \circularimage[3.5cm]{../../../assets/$assets.picture$} \\[0.3cm]
+                    \circularimage[3.5cm]{assets/$assets.picture$} \\[0.3cm]
                 $endif$
                 $if(assets.signature)$ % Signature %
                     \includegraphics[
                         width=$assets.signature_width$
-                    ]{../../../assets/$assets.signature$} \\[0.2cm]
+                    ]{assets/$assets.signature$} \\[0.2cm]
                 $endif$
 
                 $if(name)$ % Name %

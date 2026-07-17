@@ -1,0 +1,19 @@
+type: letter
+language: en
+name: Your
+surnames: Name
+phone: "+34 600 000 000"
+email: you@example.com
+webpage: yourwebsite.com
+company: Company Name
+position: Position Title
+style:
+  fontsize: 12pt
+body: |
+  Dear Hiring Manager,
+
+  Write your cover letter body here. Explain why you are interested in
+  this position and what makes you a strong candidate.
+
+  Best regards,
+  Your Name

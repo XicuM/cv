@@ -1,17 +1,15 @@
-from cv_cli.scons_helpers import (
+from cv_cli.builder import (
+    _resource,
+    build_document,
     combine_yaml_files,
-    tex_from_yaml,
-    pdf_from_tex,
-    setup_cv_env,
-    configure_cv_build,
-    get_resource_path
+    discover_persons,
+    TEMPLATE_MAP,
 )
 
 __all__ = [
+    '_resource',
+    'build_document',
     'combine_yaml_files',
-    'tex_from_yaml',
-    'pdf_from_tex',
-    'setup_cv_env',
-    'configure_cv_build',
-    'get_resource_path'
+    'discover_persons',
+    'TEMPLATE_MAP',
 ]

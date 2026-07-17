@@ -1,0 +1,61 @@
+type: cv
+language: en
+name: Your Name
+assets:
+  picture: photo.png
+  signature: signature.png
+  signature_width: 50mm
+style:
+  fontsize: 10pt
+  primary_color: "304263"
+  secondary_color: "444444"
+profile: |
+  Your professional profile summary.
+contact:
+  location: Barcelona, Spain
+  email: you@example.com
+  phone: "+34 600 000 000"
+  linkedin: linkedin.com/in/yourprofile
+  github: github.com/yourprofile
+  website: yourwebsite.com
+personal_info:
+  languages:
+    - name: English
+      level: Native
+    - name: Spanish
+      level: Native
+key_skills:
+  - category: Category Name
+    items:
+      - Skill 1
+      - Skill 2
+  - items:
+      - Uncategorized Skill
+professional_experience:
+  - position: Your Position
+    company: Company Name
+    location: City
+    dates:
+      start: Jan 2020
+      end: Present
+    details:
+      - Key achievement or responsibility.
+additional_experience:
+  - position: Volunteer / Project Role
+    company: Organization
+    location: City
+    dates:
+      start: Sep 2018
+      end: Jun 2020
+    details:
+      - What you did or accomplished.
+education:
+  - degree: Your Degree
+    institution: University Name
+    location: City
+    dates:
+      start: Sep 2018
+      end: Jun 2023
+    details:
+      - "GPA: 9.0/10"
+      - Relevant coursework or thesis.

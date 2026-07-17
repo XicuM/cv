@@ -4,18 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cv-cli"
-version = "0.1.0"
-description = "A CLI tool and SCons build system wrapper for building LaTeX CVs from YAML."
+version = "0.2.0"
+description = "CLI tool for building multi-language CVs, cover letters, and personal info cards from YAML."
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
     "click>=8.0.0",
-    "pyyaml>=6.0",
-    "scons>=4.0.0"
+    "pyyaml>=6.0"
 ]
 
 [project.scripts]
-cv-cli = "cv_cli.cli:main"
+cv = "cv_cli.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -24,4 +23,4 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-"cv_cli" = ["templates/*.tex", "i18n/*.yaml"]
+"cv_cli" = ["templates/*.tex", "i18n/*.yaml", "resources/templates/*.yaml"]

@@ -1,6 +1,12 @@
 # cv-cli
 
-A CLI tool for building multi-language CVs, cover letters, and personal info cards from YAML content files using Pandoc and LaTeX.
+A CLI tool for building multi-language CVs and cover letters from YAML content files using Pandoc and LaTeX.
+
+### Generated Templates
+
+| CV | Cover Letter |
+|---|---|
+| ![CV Preview](img/cv.png) | ![Letter Preview](img/letter.png) |
 
 ## Prerequisites
 
